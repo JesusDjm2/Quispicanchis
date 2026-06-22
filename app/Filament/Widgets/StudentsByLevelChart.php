@@ -20,6 +20,8 @@ class StudentsByLevelChart extends ChartWidget
 
     protected static ?int $sort = 7;
 
+    protected static string $view = 'filament.widgets.chart-widget';
+
     public ?string $filter = null;
 
     protected function getFilters(): ?array
@@ -60,5 +62,10 @@ class StudentsByLevelChart extends ChartWidget
     protected function getType(): string
     {
         return 'doughnut';
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: ESCALE';
     }
 }

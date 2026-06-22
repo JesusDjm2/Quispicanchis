@@ -19,6 +19,8 @@ class ManagementTypeChart extends ChartWidget
 
     protected static ?int $sort = 8;
 
+    protected static string $view = 'filament.widgets.chart-widget';
+
     protected function getData(): array
     {
         $totals = EducationalInstitution::query()
@@ -40,5 +42,10 @@ class ManagementTypeChart extends ChartWidget
     protected function getType(): string
     {
         return 'pie';
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: ESCALE';
     }
 }

@@ -39,6 +39,10 @@ class DistrictResource extends Resource
                     ->label('Ubigeo (INEI)')
                     ->maxLength(6)
                     ->unique(ignoreRecord: true),
+                Forms\Components\Toggle::make('managed_by_ugel')
+                    ->label('Gestionado por UGEL Quispicanchi')
+                    ->helperText('Desactivar solo para Lucre y Oropesa: pertenecen a la provincia pero los censa otra UGEL. Igual reciben datos INEI/MIDIS/ESCALE para el consolidado provincial.')
+                    ->default(true),
             ]);
     }
 
@@ -53,6 +57,9 @@ class DistrictResource extends Resource
                 Tables\Columns\TextColumn::make('ubigeo')
                     ->label('Ubigeo')
                     ->sortable(),
+                Tables\Columns\IconColumn::make('managed_by_ugel')
+                    ->label('UGEL Quispicanchi')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('data_records_count')
                     ->label('Registros de datos')
                     ->counts('dataRecords')

@@ -23,6 +23,8 @@ class IndicatorCompletenessTable extends BaseWidget
 
     protected static ?int $sort = 2;
 
+    protected static string $view = 'filament.widgets.table-widget';
+
     protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -51,5 +53,10 @@ class IndicatorCompletenessTable extends BaseWidget
             ])
             ->defaultSort('data_records_count', 'desc')
             ->paginated(false);
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: UGEL Quispicanchi / ESCALE / INEI / MIDIS';
     }
 }

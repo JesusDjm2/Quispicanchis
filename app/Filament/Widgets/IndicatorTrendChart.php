@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ResolvesIndicatorSourceLine;
 use App\Models\DataRecord;
 use App\Models\Indicator;
 use Filament\Widgets\ChartWidget;
@@ -14,11 +15,15 @@ use Filament\Widgets\ChartWidget;
  */
 class IndicatorTrendChart extends ChartWidget
 {
+    use ResolvesIndicatorSourceLine;
+
     protected static ?string $heading = 'Tendencia provincial 2022-2026';
 
     protected static ?string $maxHeight = '320px';
 
     protected static ?int $sort = 3;
+
+    protected static string $view = 'filament.widgets.chart-widget';
 
     public ?string $filter = null;
 

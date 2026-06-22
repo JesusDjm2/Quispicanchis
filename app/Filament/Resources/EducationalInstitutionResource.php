@@ -38,10 +38,11 @@ class EducationalInstitutionResource extends Resource
             ->schema([
                 Forms\Components\Select::make('district_id')
                     ->label('Distrito')
-                    ->relationship('district', 'name')
+                    ->relationship('district', 'name', fn ($query) => $query->ugelManaged())
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->helperText('Solo los 10 distritos censados por la UGEL Quispicanchi (Lucre y Oropesa no aparecen en este censo).'),
                 Forms\Components\TextInput::make('name')
                     ->label('Nombre de IE')
                     ->required()

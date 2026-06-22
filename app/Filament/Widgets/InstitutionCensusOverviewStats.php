@@ -17,6 +17,8 @@ class InstitutionCensusOverviewStats extends BaseWidget
 {
     protected static ?int $sort = 5;
 
+    protected static string $view = 'filament.widgets.stats-overview-widget';
+
     protected function getStats(): array
     {
         $latestYear = InstitutionLevelCensus::query()->max('census_year');
@@ -56,5 +58,10 @@ class InstitutionCensusOverviewStats extends BaseWidget
                     default => 'danger',
                 }),
         ];
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: ESCALE';
     }
 }

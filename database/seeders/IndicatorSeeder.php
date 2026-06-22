@@ -9,8 +9,11 @@ use Illuminate\Database\Seeder;
  * Producto de propiedad exclusiva de LA COMITENTE (Edutalento) - Clausula Octava del contrato.
  *
  * Indicadores educativos base del sistema "PEL Quispicanchi al 2036".
- * El indicador id:1 es 'Matrícula Escolar', usado como base para la importacion
- * consolidada de la UGEL Quispicanchi.
+ * El indicador id:1 es 'Matrícula' (unico, consolida todos los niveles y
+ * modalidades), usado como base para la importacion consolidada de la
+ * UGEL Quispicanchi. No crear indicadores de matricula adicionales por
+ * nivel (EBE, Secundaria, etc.): los valores de cada nivel se suman dentro
+ * de este unico indicador, no se reportan por separado.
  *
  * Fuentes oficiales: UGEL, ESCALE, INEI, MIDIS.
  */
@@ -21,21 +24,9 @@ class IndicatorSeeder extends Seeder
         $indicators = [
             // === INDICADOR BASE (id:1) ===
             [
-                'name'        => 'Matrícula Escolar',
+                'name'        => 'Matrícula',
                 'unit'        => 'estudiantes',
-                'description' => 'Total de estudiantes matriculados por nivel educativo en la provincia de Quispicanchi. Fuente: UGEL Quispicanchi / ESCALE.',
-            ],
-
-            // === INDICADORES EDUCATIVOS COMPLEMENTARIOS ===
-            [
-                'name'        => 'Matrícula EBE',
-                'unit'        => 'estudiantes',
-                'description' => 'Total de estudiantes matriculados en programas de Educacion Basica Especial (EBE: PRITE, Inicial y Primaria especial) por distrito. Fuente: UGEL Quispicanchi / ESCALE.',
-            ],
-            [
-                'name'        => 'Matrícula Secundaria',
-                'unit'        => 'estudiantes',
-                'description' => 'Total de estudiantes matriculados en el nivel Secundaria (Educacion Basica Regular) por distrito. Fuente: UGEL Quispicanchi / ESCALE.',
+                'description' => 'Total de estudiantes matriculados (todos los niveles y modalidades) por distrito en la provincia de Quispicanchi. Fuente: UGEL Quispicanchi / ESCALE.',
             ],
 
             [

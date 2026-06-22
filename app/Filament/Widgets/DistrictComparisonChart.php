@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ResolvesIndicatorSourceLine;
 use App\Models\DataRecord;
 use App\Models\District;
 use App\Models\Indicator;
@@ -15,11 +16,15 @@ use Filament\Widgets\ChartWidget;
  */
 class DistrictComparisonChart extends ChartWidget
 {
+    use ResolvesIndicatorSourceLine;
+
     protected static ?string $heading = 'Comparativo por distrito (último año)';
 
     protected static ?string $maxHeight = '320px';
 
     protected static ?int $sort = 4;
+
+    protected static string $view = 'filament.widgets.chart-widget';
 
     public ?string $filter = null;
 

@@ -18,6 +18,8 @@ class DataOverviewStats extends BaseWidget
 {
     protected static ?int $sort = 1;
 
+    protected static string $view = 'filament.widgets.stats-overview-widget';
+
     protected function getStats(): array
     {
         $totalRecords = DataRecord::count();
@@ -44,5 +46,10 @@ class DataOverviewStats extends BaseWidget
                     default => 'danger',
                 }),
         ];
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: UGEL Quispicanchi / ESCALE / INEI / MIDIS';
     }
 }

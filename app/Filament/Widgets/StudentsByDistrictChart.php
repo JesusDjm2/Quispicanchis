@@ -20,6 +20,8 @@ class StudentsByDistrictChart extends ChartWidget
 
     protected static ?int $sort = 6;
 
+    protected static string $view = 'filament.widgets.chart-widget';
+
     public ?string $filter = null;
 
     protected function getFilters(): ?array
@@ -43,7 +45,8 @@ class StudentsByDistrictChart extends ChartWidget
             ->groupBy('educational_institutions.district_id')
             ->pluck('total', 'district_id');
 
-        $districts = District::query()->orderBy('name')->get();
+        // Censo ESCALE de UGEL Quispicanchi: Lucre y Oropesa no aparecen aqui.
+        $districts = District::query()->ugelManaged()->orderBy('name')->get();
 
         return [
             'datasets' => [
@@ -60,5 +63,10 @@ class StudentsByDistrictChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    protected function getSourceLine(): string
+    {
+        return 'Fuente: ESCALE';
     }
 }

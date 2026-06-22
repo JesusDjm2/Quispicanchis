@@ -6,6 +6,9 @@ use App\Filament\Resources\DistrictResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ManageRecords;
 
+/**
+ * Producto de propiedad exclusiva de LA COMITENTE (Edutalento) - Clausula Octava del contrato.
+ */
 class ManageDistricts extends ManageRecords
 {
     protected static string $resource = DistrictResource::class;

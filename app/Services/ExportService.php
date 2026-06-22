@@ -18,24 +18,26 @@ use PhpOffice\PhpWord\Style\Language;
  * "PEL Quispicanchi al 2036", con la estructura rigurosa exigida por
  * el contrato para el entregable oficial.
  *
- * Por cada indicador solicitado:
+ * Por cada indicador solicitado, en este orden estricto y secuencial:
  *   a) Titulo del Indicador (Estilo Encabezado destacado).
- *   b) Tabla de Progresion Historica:
- *        Columnas: [Distrito | Ano 2022 | Ano 2023 | Ano 2024 | Ano 2025 | Ano 2026]
- *        con los valores de cada distrito atendido por UGEL Quispicanchi.
- *   c) Placeholder visible: "[Insertar Grafico de Tendencia Chart.js Aqui]".
- *   d) Leyenda obligatoria: "Fuente: UGEL Quispicanchi / ESCALE | Elaboracion: Edutalento"
+ *   b) Tabla de Progresion Historica [Distrito | Ano 2022..2026],
+ *      seguida de su propia fuente + leyenda "Elaboracion: Edutalento".
+ *   c) Grafico de tendencia (placeholder visible para pegado manual desde
+ *      el widget Chart.js), seguido de su propia fuente + leyenda.
+ *   d) Referencias bibliograficas APA 7.a edicion de las fuentes usadas
+ *      (ver ApaReferenceService).
  */
 class ExportService
 {
+    public function __construct(
+        private readonly ApaReferenceService $apaReferences,
+    ) {}
+
     /** Periodo oficial del contrato. */
     private const DEFAULT_YEARS = [2022, 2023, 2024, 2025, 2026];
 
     /** Etiqueta de grÃ¡fico placeholder. */
     private const CHART_PLACEHOLDER = '[Insertar Grafico de Tendencia Chart.js Aqui]';
-
-    /** Fuente por defecto del reporte. */
-    private const SOURCE_TEXT = 'Fuente: UGEL Quispicanchi / ESCALE';
 
     /** Leyenda obligatoria del contrato. */
     private const LEGEND = 'Elaboracion: Edutalento';
@@ -163,11 +165,13 @@ class ExportService
     }
 
     /**
-     * Agrega la seccion completa de un indicador al documento:
-     *   a) Titulo del Indicador (Encabezado nivel 2)
-     *   b) Tabla de Progresion Historica [Distrito | 2022 | 2023 | 2024 | 2025 | 2026]
-     *   c) Placeholder del grafico
-     *   d) Leyenda "Fuente: ... | Elaboracion: Edutalento"
+     * Agrega la seccion completa de un indicador al documento, en el orden
+     * estricto y secuencial exigido por el contrato:
+     *   a) Titulo del Indicador (Encabezado nivel 2).
+     *   b) Tabla de Progresion Historica [Distrito | 2022..2026] + su propia
+     *      fuente y leyenda "Elaboracion: Edutalento".
+     *   c) Grafico de tendencia (placeholder) + su propia fuente y leyenda.
+     *   d) Referencias bibliograficas APA 7 de las fuentes usadas.
      *
      * @param  \PhpOffice\PhpWord\Element\Section  $section
      * @param  Indicator  $indicator
@@ -197,24 +201,27 @@ class ExportService
         $section->addTextBreak(1);
 
         // Cargar registros de una sola vez
-        $recordsByDistrict = DataRecord::query()
+        $records = DataRecord::query()
             ->where('indicator_id', $indicator->id)
             ->whereIn('year', $years)
-            ->get()
-            ->groupBy('district_id');
+            ->get();
+        $recordsByDistrict = $records->groupBy('district_id');
+        $sourceLine = $this->apaReferences->sourceLine($records);
 
-        // --- b) TABLA DE PROGRESION HISTORICA ---
+        // --- b) TABLA DE PROGRESION HISTORICA + SU FUENTE/LEYENDA ---
         $this->addHistoricalTable($section, $districts, $years, $recordsByDistrict);
-
+        $section->addTextBreak(1);
+        $this->addSourceAndLegend($section, $sourceLine);
         $section->addTextBreak(1);
 
-        // --- c) PLACEHOLDER DEL GRAFICO ---
+        // --- c) GRAFICO DE TENDENCIA (PLACEHOLDER) + SU FUENTE/LEYENDA ---
         $this->addChartPlaceholder($section, $indicator);
-
+        $section->addTextBreak(1);
+        $this->addSourceAndLegend($section, $sourceLine);
         $section->addTextBreak(1);
 
-        // --- d) LEYENDA OBLIGATORIA ---
-        $this->addLegend($section);
+        // --- d) REFERENCIAS BIBLIOGRAFICAS APA 7 ---
+        $this->addBibliography($section, $indicator, $years);
     }
 
     /**
@@ -261,7 +268,7 @@ class ExportService
 
         // Anchos de columna (en twips): Distrito mas ancho, aÃ±os iguales
         $colWidths = [2200];
-        foreach ($years as $i => $year) {
+        foreach ($years as $year) {
             $colWidths[] = 1300;
         }
 
@@ -338,13 +345,44 @@ class ExportService
     }
 
     /**
-     * Agrega la leyenda obligatoria al pie de cada seccion de indicador.
+     * Agrega la fuente y la leyenda obligatoria "Elaboracion: Edutalento"
+     * inmediatamente despues de un bloque (tabla o grafico).
      *
      * @param  \PhpOffice\PhpWord\Element\Section  $section
+     * @param  string  $sourceLine  Linea "Fuente: ..." propia del bloque.
      */
-    private function addLegend(\PhpOffice\PhpWord\Element\Section $section): void
+    private function addSourceAndLegend(\PhpOffice\PhpWord\Element\Section $section, string $sourceLine): void
     {
-        $section->addText(self::SOURCE_TEXT, 'legendStyle');
+        $section->addText($sourceLine, 'legendStyle');
         $section->addText(self::LEGEND, 'legendStyle');
+    }
+
+    /**
+     * Agrega la seccion de referencias bibliograficas APA 7.a edicion,
+     * a partir de las fuentes realmente usadas en los registros del indicador.
+     *
+     * @param  \PhpOffice\PhpWord\Element\Section  $section
+     * @param  Indicator  $indicator
+     * @param  array<int, int>  $years
+     */
+    private function addBibliography(\PhpOffice\PhpWord\Element\Section $section, Indicator $indicator, array $years): void
+    {
+        $references = $this->apaReferences->forIndicator($indicator, $years);
+
+        if ($references === []) {
+            return;
+        }
+
+        $section->addText(
+            'Referencias bibliográficas (APA 7.ª ed.)',
+            ['bold' => true, 'size' => 10, 'color' => '2E75B6'],
+        );
+
+        foreach ($references as $reference) {
+            $section->addText($reference, ['size' => 9, 'color' => '444444'], [
+                'hanging' => Converter::cmToTwip(0.75),
+                'spaceAfter' => 100,
+            ]);
+        }
     }
 }
