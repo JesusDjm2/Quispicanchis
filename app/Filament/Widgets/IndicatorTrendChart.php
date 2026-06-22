@@ -18,6 +18,8 @@ class IndicatorTrendChart extends ChartWidget
 
     protected static ?string $maxHeight = '320px';
 
+    protected static ?int $sort = 3;
+
     public ?string $filter = null;
 
     protected function getFilters(): ?array

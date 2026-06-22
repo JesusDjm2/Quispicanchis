@@ -95,6 +95,16 @@ class DataRecordResource extends Resource
                 Tables\Columns\TextColumn::make('source')
                     ->label('Fuente')
                     ->badge(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Cargado')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Actualizado')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('year', 'desc')
             ->filters([

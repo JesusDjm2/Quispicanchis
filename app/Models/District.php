@@ -19,4 +19,9 @@ class District extends Model
     {
         return $this->hasMany(DataRecord::class);
     }
+
+    public function educationalInstitutions(): HasMany
+    {
+        return $this->hasMany(EducationalInstitution::class);
+    }
 }

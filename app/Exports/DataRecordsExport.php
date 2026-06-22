@@ -40,7 +40,7 @@ class DataRecordsExport implements FromQuery, WithEvents, WithHeadings, WithMapp
 
     public function headings(): array
     {
-        return ['Distrito', 'Indicador', 'Unidad', 'Año', 'Valor', 'Fuente'];
+        return ['Distrito', 'Indicador', 'Unidad', 'Año', 'Valor', 'Fuente', 'Fecha de carga'];
     }
 
     public function map(mixed $record): array
@@ -53,6 +53,7 @@ class DataRecordsExport implements FromQuery, WithEvents, WithHeadings, WithMapp
             $record->year,
             (float) $record->value,
             $record->source,
+            $record->created_at?->format('d/m/Y H:i'),
         ];
     }
 

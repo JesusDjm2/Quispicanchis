@@ -8,9 +8,13 @@ use Illuminate\Database\Seeder;
 /**
  * Producto de propiedad exclusiva de LA COMITENTE (Edutalento) - Clausula Octava del contrato.
  *
- * Los 12 distritos oficiales de la provincia de Quispicanchi (Cusco), con su
- * ubigeo INEI (departamento 08, provincia 12), base para el proyecto
+ * Los 10 distritos atendidos por la UGEL Quispicanchi, base para el proyecto
  * "PEL Quispicanchi al 2036".
+ *
+ * Lucre y Oropesa pertenecen politicamente a la provincia de Quispicanchi pero
+ * son atendidos por una UGEL distinta: no aparecen en ningun censo ESCALE de
+ * UGEL Quispicanchi (verificado con los archivos de matricula 2025 y 2026),
+ * y el contrato original habla de "10 distritos". Por eso se excluyen aqui.
  */
 class DistrictSeeder extends Seeder
 {
@@ -24,10 +28,8 @@ class DistrictSeeder extends Seeder
             ['name' => 'Ccatca', 'ubigeo' => '081205'],
             ['name' => 'Cusipata', 'ubigeo' => '081206'],
             ['name' => 'Huaro', 'ubigeo' => '081207'],
-            ['name' => 'Lucre', 'ubigeo' => '081208'],
             ['name' => 'Marcapata', 'ubigeo' => '081209'],
             ['name' => 'Ocongate', 'ubigeo' => '081210'],
-            ['name' => 'Oropesa', 'ubigeo' => '081211'],
             ['name' => 'Quiquijana', 'ubigeo' => '081212'],
         ];
 

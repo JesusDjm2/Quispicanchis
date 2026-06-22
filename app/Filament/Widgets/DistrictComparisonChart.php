@@ -19,6 +19,8 @@ class DistrictComparisonChart extends ChartWidget
 
     protected static ?string $maxHeight = '320px';
 
+    protected static ?int $sort = 4;
+
     public ?string $filter = null;
 
     protected function getFilters(): ?array

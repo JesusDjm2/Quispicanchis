@@ -24,6 +24,7 @@ class DataRecord extends Model
         'ESCALE' => 'ESCALE',
         'INEI' => 'INEI',
         'MIDIS' => 'MIDIS',
+        'UGEL QUISPICANCHI / ESCALE' => 'UGEL Quispicanchi / ESCALE',
     ];
 
     protected $fillable = [
