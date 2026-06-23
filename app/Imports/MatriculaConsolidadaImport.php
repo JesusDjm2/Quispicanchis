@@ -199,8 +199,8 @@ class MatriculaConsolidadaImport implements SkipsEmptyRows, ToCollection
         $districtName = trim((string) ($row[$columns['distrito']] ?? ''));
 
         if ($districtName === '') {
-            // Fila vacia o sin distrito → se omite silenciosamente
-            throw new \InvalidArgumentException('Fila sin nombre de distrito.');
+            // Fila vacia o sub-cabecera de columnas agrupadas (sin distrito) → se omite silenciosamente
+            return;
         }
 
         // NO procesar filas que sean subtotales/grandes totales
