@@ -9,7 +9,7 @@ Sistema de **indicadores educativos** para la provincia de Quispicanchi (Cusco, 
 1. **Carga datos** de indicadores educativos/sociales por distrito y año (2022-2026), desde Excel/CSV o formulario manual, con su fuente oficial (UGEL, ESCALE, INEI, MIDIS).
 2. **Carga el padrón ESCALE de Instituciones Educativas** (censo anual: alumnos, docentes, secciones por IE y nivel/modalidad), para estadísticas y demografía a nivel de institución, no solo de distrito.
 3. **Visualiza** todo en un panel admin (Filament) con stats y gráficos (Chart.js): completitud de datos, tendencias provinciales, comparativos por distrito, alumnos por nivel/gestión.
-4. **Exporta** reportes oficiales en Excel y Word (.docx) con la estructura exigida por el contrato (tabla de progresión histórica + leyenda de fuente).
+4. **Exporta** reportes oficiales en Excel (plano, progresión histórica por indicador, o consolidado multi-indicador en pestañas) y Word (.docx), con la estructura exigida por el contrato: tabla de progresión histórica + fuente real usada + leyenda "Elaboración: Edutalento" + referencias bibliográficas en formato APA 7.ª ed.
 
 ## Stack
 
@@ -40,13 +40,16 @@ Sistema de **indicadores educativos** para la provincia de Quispicanchi (Cusco, 
 | `MatriculaConsolidadaImport` | Excel consolidado de matrícula UGEL/ESCALE: una fila por IE, **suma** por distrito+año hacia un `Indicator` elegido en el formulario. Detecta la fila de cabecera real buscando la columna "Distrito" (tolera filas de título antes). |
 | `EscaleInstitutionsImport` | Padrón ESCALE "Instituciones": una fila por IE x Nivel/Modalidad. Filtra solo provincia Quispicanchi, agrupa niveles bajo la misma IE, año de censo se indica en el formulario (el archivo no lo trae). |
 | `app/Imports/Concerns/ResolvesDistricts.php` | Trait compartido: resuelve el nombre de distrito de una fila contra los `District` existentes, tolerando tildes y errores de tipeo (Levenshtein ≤2). Lo usan `MatriculaConsolidadaImport` y `EscaleInstitutionsImport`. |
-| `DataRecordsExport` | Export Excel de todos los `DataRecord`. |
-| `ExportService` | Genera el reporte Word oficial por indicador: tabla de progresión histórica 2022-2026 por distrito + leyenda "Fuente: UGEL Quispicanchi / ESCALE \| Elaboración: Edutalento". El gráfico de tendencia queda como placeholder de texto (se pega manualmente desde el widget Chart.js). |
+| `DataRecordsExport` | Export Excel plano de todos los `DataRecord`. |
+| `HistoricalProgressionExport` | Export Excel de un indicador: tabla de progresión histórica 2022-2026 por distrito + fuente real usada + leyenda + referencias APA 7 al pie. Misma estructura que la tabla del reporte Word. |
+| `ConsolidatedHistoricalExport` | Export Excel multi-indicador: una pestaña por indicador, cada una generada con `HistoricalProgressionExport`. |
+| `ExportService` | Genera el reporte Word oficial por indicador, en orden estricto: a) título del indicador, b) tabla de progresión histórica + fuente + leyenda "Elaboración: Edutalento", c) placeholder de gráfico de tendencia (se pega manualmente desde el widget Chart.js) + fuente + leyenda, d) referencias bibliográficas APA 7. |
+| `ApaReferenceService` | Resuelve, a partir de las fuentes (`DataRecord::SOURCES`) realmente usadas por los `DataRecord` de un indicador, la línea "Fuente: ..." y las referencias bibliográficas APA 7.ª ed. correspondientes, leyendo el catálogo fijo en `config/references.php`. Lo usan `ExportService`, `HistoricalProgressionExport` y el trait `ResolvesIndicatorSourceLine` (widgets). Las citas en `config/references.php` son fijas por contrato; un cambio ahí aplica de inmediato a todos los reportes. |
 
 ## Panel Filament (`app/Filament`)
 
-- **Resources**: `DistrictResource`, `IndicatorResource`, `DataRecordResource` (con acciones de import Excel/matrícula y export Excel/Word en `ListDataRecords`), `EducationalInstitutionResource` (con acción "Importar censo ESCALE" y un RelationManager `LevelCensusesRelationManager` para ver/editar los niveles censados de cada IE).
-- **Widgets** (auto-descubiertos por `AdminPanelProvider`, no requieren registro manual): `DataOverviewStats`, `IndicatorCompletenessTable`, `IndicatorTrendChart`, `DistrictComparisonChart` (indicadores genéricos) + `InstitutionCensusOverviewStats`, `StudentsByDistrictChart`, `StudentsByLevelChart`, `ManagementTypeChart` (censo ESCALE por institución).
+- **Resources**: `DistrictResource`, `IndicatorResource`, `DataRecordResource` (con `ListDataRecords` agrupando las acciones en dos desplegables — "Importar": Excel UGEL genérico y Matrícula Consolidada; "Exportar": Excel plano, Excel progresión histórica, Excel consolidado multi-indicador y Word — en vez de botones sueltos), `EducationalInstitutionResource` (con acción "Importar censo ESCALE" y un RelationManager `LevelCensusesRelationManager` para ver/editar los niveles censados de cada IE).
+- **Widgets** (auto-descubiertos por `AdminPanelProvider`, no requieren registro manual): `DataOverviewStats`, `IndicatorCompletenessTable`, `IndicatorTrendChart`, `DistrictComparisonChart` (indicadores genéricos) + `InstitutionCensusOverviewStats`, `StudentsByDistrictChart`, `StudentsByLevelChart`, `ManagementTypeChart` (censo ESCALE por institución). Los widgets con selector de indicador usan el trait `app/Filament/Widgets/Concerns/ResolvesIndicatorSourceLine.php` para mostrar la fuente real (vía `ApaReferenceService`) en vez de un texto fijo.
 - Color primario del panel: ámbar (`#d97706` en los gráficos, consistente en todos los widgets).
 
 ## Convenciones a seguir
